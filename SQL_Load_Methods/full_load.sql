@@ -16,3 +16,8 @@ BEGIN
         VALUES ('FullLoad_Students', 'ERROR', ERROR_MESSAGE());
     END CATCH
 END;
+
+EXEC Staging.FullLoad_Students;
+
+SELECT * FROM Staging.Students;
+SELECT * FROM Audit.Logs;

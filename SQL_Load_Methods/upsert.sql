@@ -17,7 +17,7 @@ BEGIN
             OR S.Age <> L.Age
             OR S.UpdatedAt <> L.UpdatedAt;
 
-        -- INSERT new
+        -- INSERT NEW
         INSERT INTO Staging.Students (Id, Name, Age, UpdatedAt)
         SELECT L.Id, L.Name, L.Age, L.UpdatedAt
         FROM Landing.Students L

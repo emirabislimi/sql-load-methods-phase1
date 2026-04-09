@@ -1,3 +1,6 @@
+USE ETL_Project;
+GO
+-- Insert only NEW records 
 CREATE OR ALTER PROCEDURE Staging.Append_Students
 AS
 BEGIN
@@ -19,3 +22,6 @@ BEGIN
         VALUES ('Append_Students', 'ERROR', ERROR_MESSAGE());
     END CATCH
 END;
+
+EXEC Staging.Append_Students;
+SELECT * FROM Staging.Students;

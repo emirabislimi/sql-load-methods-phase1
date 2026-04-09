@@ -16,3 +16,4 @@ GO
 IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = 'Audit')
     EXEC('CREATE SCHEMA Audit');
 GO
+
