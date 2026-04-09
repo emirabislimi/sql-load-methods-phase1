@@ -1,8 +1,12 @@
+-- FULL LOAD (IMPROVED- parameter+performace)
+
 CREATE OR ALTER PROCEDURE Staging.FullLoad_Students
+    @TableName VARCHAR(50) -- CHANGED: added parameter
 AS
 BEGIN
     BEGIN TRY
-        DELETE FROM Staging.Students;
+
+        TRUNCATE TABLE Staging.Students; -- CHANGED: better performance
 
         INSERT INTO Staging.Students (Id, Name, Age, UpdatedAt)
         SELECT Id, Name, Age, UpdatedAt
@@ -10,14 +14,10 @@ BEGIN
 
         INSERT INTO Audit.Logs (ProcedureName, Status, Message)
         VALUES ('FullLoad_Students', 'SUCCESS', 'Full load completed');
+
     END TRY
     BEGIN CATCH
         INSERT INTO Audit.Logs (ProcedureName, Status, Message)
         VALUES ('FullLoad_Students', 'ERROR', ERROR_MESSAGE());
     END CATCH
 END;
-
-EXEC Staging.FullLoad_Students;
-
-SELECT * FROM Staging.Students;
-SELECT * FROM Audit.Logs;
