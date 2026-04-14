@@ -1,0 +1,25 @@
+[33m85214cf[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mphase1/sql-full-load[m[33m, [m[1;31morigin/phase1/sql-full-load[m[33m)[m Optimize Upsert and add parameter
+[33m6b1283d[m Add basic Upsert (update all + insert)
+[33m044980b[m Enhance Full Load with TRUNCATE and parameter
+[33m9187840[m Merge branch 'phase1/sql-full-load' of https://github.com/emirabislimi/sql-load-methods-phase1 into phase1/sql-full-load
+[33mbfb0e99[m[33m ([m[1;31morigin/phase1/sql-sync[m[33m, [m[1;32mphase1/sql-sync[m[33m)[m Add basic Full Load procedure (hardcoded)
+[33m56f63f0[m Merge pull request #1 from emirabislimi/phase1/sql-sync
+[33m2a5edc1[m Complete SQL load methods and setup script
+[33m7fa945b[m Converted Sync into stored procedure
+[33m8e33c83[m Initial Sync logic
+[33mbdbd2ba[m Converted Incremental Load into stored procedure
+[33m9310507[m Initial Incremental Load logic
+[33m109d03f[m Converted Append into stored procedure
+[33m0a7a7ac[m Initial Append logic
+[33m9499c4d[m Converted Upsert into stored procedure
+[33m51ee121[m Converted Full_Load into stored procedure
+[33m5eedabb[m Initial Full_Load with basic insert logic
+[33md3109ef[m Enhanced Sync with dynamic parameters
+[33m488be23[m Initial Sync logic with insert, update, delete
+[33mb637df4[m[33m ([m[1;31morigin/phase1/sql-incremental[m[33m, [m[1;32mphase1/sql-incremental[m[33m)[m Enhanced Incremental Load with dynamic parameters
+[33md11d9db[m Initial Incremental Load logic
+[33ma1210e0[m[33m ([m[1;31morigin/phase1/sql-append[m[33m, [m[1;32mphase1/sql-append[m[33m)[m Enhanced Append with dynamic parameters
+[33m0f59f7c[m Initial Append logic
+[33m8852861[m[33m ([m[1;31morigin/phase1/sql-upsert[m[33m, [m[1;32mphase1/sql-upsert[m[33m)[m Initial Upsert with basic MERGE logic
+[33m6a41775[m Enhanced Full_Load with dynamic parameters
+[33m2d11b97[m Initial Full_Load procedure with hardcoded values
