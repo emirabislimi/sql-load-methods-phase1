@@ -1,6 +1,7 @@
--- UPSERT (BASIC)
+-- UPSERT (IMPROVED)
 
 CREATE OR ALTER PROCEDURE Staging.Upsert_Students
+    @TableName VARCHAR(50) -- CHANGED
 AS
 BEGIN
     BEGIN TRY
@@ -12,8 +13,12 @@ BEGIN
             S.UpdatedAt = L.UpdatedAt
         FROM Staging.Students S
         INNER JOIN Landing.Students L
-            ON S.Id = L.Id;
-        -- basic: updates all rows
+            ON S.Id = L.Id
+        WHERE 
+            S.Name <> L.Name
+            OR S.Age <> L.Age
+            OR S.UpdatedAt <> L.UpdatedAt;
+        -- CHANGED: update only changed rows
 
         INSERT INTO Staging.Students (Id, Name, Age, UpdatedAt)
         SELECT L.Id, L.Name, L.Age, L.UpdatedAt
