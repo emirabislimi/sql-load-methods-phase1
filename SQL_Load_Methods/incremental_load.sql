@@ -1,24 +1,22 @@
---ENHANCED 
-
-USE ETL_Project;
-GO
+-- ENHANCED VERSION
 
 CREATE OR ALTER PROCEDURE Staging.Incremental_Students
+    @TableName VARCHAR(50) -- Changed
 AS
 BEGIN
     BEGIN TRY
 
         DECLARE @LastLoad DATETIME;
 
+        -- get last load time from config table
         SELECT @LastLoad = LastLoadTime
         FROM Audit.Config
-        WHERE TableName = 'Students';
+        WHERE TableName = @TableName; -- Changed
 
-        -- load everything firts time
         IF @LastLoad IS NULL
             SET @LastLoad = '1900-01-01';
 
-        -- update only changed or newer
+        -- UPDATE 
         UPDATE S
         SET 
             S.Name = L.Name,
@@ -30,12 +28,12 @@ BEGIN
         WHERE 
             L.UpdatedAt > @LastLoad
             AND (
-                S.Name <> L.Name
-                OR S.Age <> L.Age
+                ISNULL(S.Name,'') <> ISNULL(L.Name,'') -- handles NULL values so comparison works correctly
+                OR ISNULL(S.Age,0) <> ISNULL(L.Age,0) -- replaces NULL with 0 to detect changes
                 OR S.UpdatedAt <> L.UpdatedAt
             );
 
-        -- insert new records
+        -- INSERT
         INSERT INTO Staging.Students (Id, Name, Age, UpdatedAt)
         SELECT L.Id, L.Name, L.Age, L.UpdatedAt
         FROM Landing.Students L
@@ -45,10 +43,14 @@ BEGIN
             S.Id IS NULL
             AND L.UpdatedAt > @LastLoad;
 
-        -- update last load time
-        UPDATE Audit.Config
-        SET LastLoadTime = GETDATE()
-        WHERE TableName = 'Students';
+        -- SAFE CONFIG UPDATE
+        IF EXISTS (SELECT 1 FROM Audit.Config WHERE TableName = @TableName)
+            UPDATE Audit.Config
+            SET LastLoadTime = GETDATE()
+            WHERE TableName = @TableName;
+        ELSE
+            INSERT INTO Audit.Config (TableName, LastLoadTime)
+            VALUES (@TableName, GETDATE());
 
         INSERT INTO Audit.Logs (ProcedureName, Status, Message)
         VALUES ('Incremental_Students', 'SUCCESS', 'Incremental load completed');
@@ -59,4 +61,5 @@ BEGIN
         VALUES ('Incremental_Students', 'ERROR', ERROR_MESSAGE());
     END CATCH
 END;
-GO
+
+EXEC Staging.Incremental_Students 'Students';
