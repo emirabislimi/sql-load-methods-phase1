@@ -1,14 +1,24 @@
--- BASIC INCREMENTAL (HARDCODED DATE)
+--ENHANCED 
+
+USE ETL_Project;
+GO
 
 CREATE OR ALTER PROCEDURE Staging.Incremental_Students
 AS
 BEGIN
     BEGIN TRY
 
-        -- HARDCODED DATE (BASIC)
-        DECLARE @LastLoad DATETIME = '2020-01-01'; -- CHANGED
+        DECLARE @LastLoad DATETIME;
 
-        -- UPDATE
+        SELECT @LastLoad = LastLoadTime
+        FROM Audit.Config
+        WHERE TableName = 'Students';
+
+        -- load everything firts time
+        IF @LastLoad IS NULL
+            SET @LastLoad = '1900-01-01';
+
+        -- update only changed or newer
         UPDATE S
         SET 
             S.Name = L.Name,
@@ -18,9 +28,14 @@ BEGIN
         INNER JOIN Landing.Students L
             ON S.Id = L.Id
         WHERE 
-            L.UpdatedAt > @LastLoad;
+            L.UpdatedAt > @LastLoad
+            AND (
+                S.Name <> L.Name
+                OR S.Age <> L.Age
+                OR S.UpdatedAt <> L.UpdatedAt
+            );
 
-        -- INSERT
+        -- insert new records
         INSERT INTO Staging.Students (Id, Name, Age, UpdatedAt)
         SELECT L.Id, L.Name, L.Age, L.UpdatedAt
         FROM Landing.Students L
@@ -30,8 +45,13 @@ BEGIN
             S.Id IS NULL
             AND L.UpdatedAt > @LastLoad;
 
+        -- update last load time
+        UPDATE Audit.Config
+        SET LastLoadTime = GETDATE()
+        WHERE TableName = 'Students';
+
         INSERT INTO Audit.Logs (ProcedureName, Status, Message)
-        VALUES ('Incremental_Students', 'SUCCESS', 'Basic incremental load completed');
+        VALUES ('Incremental_Students', 'SUCCESS', 'Incremental load completed');
 
     END TRY
     BEGIN CATCH
@@ -39,3 +59,4 @@ BEGIN
         VALUES ('Incremental_Students', 'ERROR', ERROR_MESSAGE());
     END CATCH
 END;
+GO
