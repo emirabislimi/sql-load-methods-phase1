@@ -1,3 +1,5 @@
+--BASIC 
+
 CREATE PROCEDURE Staging.Sync_Students
 AS
 BEGIN
