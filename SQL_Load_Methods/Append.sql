@@ -1,6 +1,5 @@
--- BASIC APPEND (HARDCODED)
-
 CREATE OR ALTER PROCEDURE Staging.Append_Students
+    @TableName VARCHAR(50) -- NEW CHANGE
 AS
 BEGIN
     BEGIN TRY
@@ -10,7 +9,8 @@ BEGIN
         FROM Landing.Students L
         LEFT JOIN Staging.Students S
             ON L.Id = S.Id
-        WHERE S.Id IS NULL;
+        WHERE S.Id IS NULL
+        AND L.UpdatedAt IS NOT NULL; -- NEW CHANGE
 
         INSERT INTO Audit.Logs (ProcedureName, Status, Message)
         VALUES ('Append_Students', 'SUCCESS', 'Append completed');
