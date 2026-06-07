@@ -1,23 +1,52 @@
--- FULL LOAD (IMPROVED- parameter+performace)
-
 CREATE OR ALTER PROCEDURE Staging.FullLoad_Students
-    @TableName VARCHAR(50) -- CHANGED: added parameter
+    @TableName VARCHAR(50)
 AS
 BEGIN
+    SET NOCOUNT ON;
+
     BEGIN TRY
 
-        TRUNCATE TABLE Staging.Students; -- CHANGED: better performance
+        DECLARE @SQL NVARCHAR(MAX);
 
-        INSERT INTO Staging.Students (Id, Name, Age, UpdatedAt)
-        SELECT Id, Name, Age, UpdatedAt
-        FROM Landing.Students;
+        SET @SQL = '
+            TRUNCATE TABLE Staging.' + QUOTENAME(@TableName) + ';
 
-        INSERT INTO Audit.Logs (ProcedureName, Status, Message)
-        VALUES ('FullLoad_Students', 'SUCCESS', 'Full load completed');
+            INSERT INTO Staging.' + QUOTENAME(@TableName) + '
+            SELECT *
+            FROM Landing.' + QUOTENAME(@TableName) + ';
+        ';
+
+        EXEC sp_executesql @SQL;
+
+        INSERT INTO Audit.Logs
+        (
+            ProcedureName,
+            Status,
+            Message
+        )
+        VALUES
+        (
+            'FullLoad',
+            'SUCCESS',
+            'Full load completed for table ' + @TableName
+        );
 
     END TRY
     BEGIN CATCH
-        INSERT INTO Audit.Logs (ProcedureName, Status, Message)
-        VALUES ('FullLoad_Students', 'ERROR', ERROR_MESSAGE());
+
+        INSERT INTO Audit.Logs
+        (
+            ProcedureName,
+            Status,
+            Message
+        )
+        VALUES
+        (
+            'FullLoad',
+            'ERROR',
+            ERROR_MESSAGE()
+        );
+
     END CATCH
 END;
+GO
